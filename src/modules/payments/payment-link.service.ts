@@ -1,13 +1,17 @@
 import { randomUUID } from "node:crypto";
 import { env } from "../../config/env.js";
 import { boldLinkClient } from "../bold/bold-link.client.js";
-import { prisma } from "../../lib/prisma.js";
 import { AppError, NotFoundError } from "../../shared/errors.js";
 import type { MatuByteApp } from "../apps/app.types.js";
 import { appRegistry } from "../apps/app.registry.js";
 import { resolveAmountCop } from "./currency.service.js";
 import { resolveBoldCallbackForApp } from "./callback-url.js";
 import { resolveAppReturnUrl } from "../apps/return-url.js";
+import {
+  findPaymentByLinkOrReference,
+  updatePaymentStatus,
+  upsertPaymentByReference,
+} from "../../repositories/payment.repository.js";
 
 export interface CreatePaymentLinkInput {
   app: MatuByteApp;
@@ -17,7 +21,6 @@ export interface CreatePaymentLinkInput {
   reference?: string;
   description?: string;
   license?: string;
-  /** URL del frontend de esta app (override; si no, returnUrls del YAML) */
   returnUrl?: string;
 }
 
@@ -65,27 +68,17 @@ export class PaymentLinkService {
       payment_methods,
     });
 
-    const payment = await prisma.payment.upsert({
-      where: { reference },
-      create: {
-        appId: app.id,
-        reference,
-        productId,
-        paymentLinkId: link.payment_link,
-        checkoutUrl: link.url,
-        status: "ACTIVE",
-        amountTotal: total_amount,
-        currency,
-        paymentMethod: "PAYMENT_LINK",
-        description,
-      },
-      update: {
-        paymentLinkId: link.payment_link,
-        checkoutUrl: link.url,
-        status: "ACTIVE",
-        amountTotal: total_amount,
-        updatedAt: new Date(),
-      },
+    const payment = await upsertPaymentByReference({
+      appId: app.id,
+      reference,
+      productId: productId ?? null,
+      paymentLinkId: link.payment_link,
+      checkoutUrl: link.url,
+      status: "ACTIVE",
+      amountTotal: total_amount,
+      currency,
+      paymentMethod: "PAYMENT_LINK",
+      description,
     });
 
     return {
@@ -118,24 +111,16 @@ export class PaymentLinkService {
   }
 
   async getLinkStatus(linkId: string, appId?: string) {
-    const payment = await prisma.payment.findFirst({
-      where: {
-        OR: [{ paymentLinkId: linkId }, { reference: linkId }],
-      },
-    });
+    const payment = await findPaymentByLinkOrReference(linkId);
     if (!payment) throw new NotFoundError("Transacción no encontrada");
-    if (appId && payment.appId !== appId) throw new NotFoundError("Transacción no encontrada");
+    if (appId && payment.app_id !== appId) throw new NotFoundError("Transacción no encontrada");
 
-    const boldId = payment.paymentLinkId ?? linkId;
+    const boldId = payment.payment_link_id ?? linkId;
     const data = await boldLinkClient.getPaymentLink(boldId);
 
-    await prisma.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: data.status,
-        boldTransactionId: data.transaction_id ?? payment.boldTransactionId,
-        updatedAt: new Date(),
-      },
+    await updatePaymentStatus(payment.id, {
+      status: data.status,
+      boldTransactionId: data.transaction_id ?? payment.bold_transaction_id,
     });
 
     return {
@@ -146,7 +131,7 @@ export class PaymentLinkService {
         id: data.id,
         transaction_id: data.transaction_id,
         reference: payment.reference,
-        appId: payment.appId,
+        appId: payment.app_id,
       },
     };
   }

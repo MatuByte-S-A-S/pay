@@ -1,18 +1,15 @@
-import { mkdir } from "node:fs/promises";
-import path from "node:path";
-import { env } from "./config/env.js";
 import { buildApp } from "./app.js";
+import { env } from "./config/env.js";
 import { appRegistry } from "./modules/apps/app.registry.js";
-
-async function ensureDataDir() {
-  const dbPath = env.DATABASE_URL.replace("file:", "");
-  const dir = path.dirname(dbPath);
-  await mkdir(dir, { recursive: true });
-}
+import { checkMatuDbConnection } from "./db/matu.js";
 
 async function main() {
-  await ensureDataDir();
   await appRegistry.load();
+
+  const matudb = await checkMatuDbConnection();
+  if (!matudb.ok) {
+    console.warn("[paymatubyte] MatuDB:", matudb.message ?? "no disponible");
+  }
 
   const app = await buildApp();
   await app.listen({ port: env.PORT, host: env.HOST });

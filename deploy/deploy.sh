@@ -12,9 +12,6 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-mkdir -p data
-
-# Red inestable en VPS: reintentos al descargar binarios de Prisma
 export npm_config_fetch_retries=5
 export npm_config_fetch_retry_mintimeout=20000
 export npm_config_fetch_retry_maxtimeout=120000
@@ -39,27 +36,14 @@ run_retry() {
   done
 }
 
-install_deps() {
-  if [[ -d node_modules ]] && npm ls @prisma/client &>/dev/null; then
-    echo "→ node_modules OK, omitiendo npm ci"
-    return 0
-  fi
+if [[ -d node_modules ]] && npm ls @devjuanes/matuclient &>/dev/null; then
+  echo "→ node_modules OK"
+else
+  run_retry "npm ci" npm ci || run_retry "npm ci --ignore-scripts" npm ci --ignore-scripts
+fi
 
-  if run_retry "npm ci" npm ci; then
-    return 0
-  fi
-
-  echo "→ npm ci con --ignore-scripts (evita postinstall de Prisma en la red)"
-  run_retry "npm ci --ignore-scripts" npm ci --ignore-scripts
-}
-
-install_deps
-
-run_retry "prisma generate" npx prisma generate
-
-echo "→ build + db"
+echo "→ build"
 npm run build
-npm run db:push
 
 if pm2 describe paymatubyte &>/dev/null; then
   pm2 restart paymatubyte --update-env
@@ -70,4 +54,4 @@ fi
 pm2 save
 
 echo "✓ PayMatuByte en PM2 — https://pay.matubyte.com/health"
-echo "  pm2 logs paymatubyte"
+echo "  MatuDB: ejecuta sql/schema.sql en tu proyecto MatuDB si es la primera vez"

@@ -21,6 +21,9 @@ Misma integración que **fymapp-api** (API Link de pagos), configurable por app 
 ## Variables `.env` (copiar de fymapp)
 
 ```env
+MATUDB_URL=https://db.matudb.com
+MATUDB_PROJECT_ID=tu-proyecto
+MATUDB_SERVICE_KEY=mb_...
 NODE_ENV=development
 URL_API_BOLD=https://integrations.api.bold.co/online/link/v1
 AUTHORIZATION_BOLD="x-api-key <llave producción>"
@@ -109,7 +112,7 @@ GET /health
 
 ```bash
 npm install
-npm run db:push
+# Ejecuta sql/schema.sql en MatuDB (o npm run db:setup)
 npm run dev
 ```
 

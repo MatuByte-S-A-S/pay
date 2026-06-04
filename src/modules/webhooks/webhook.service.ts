@@ -1,8 +1,14 @@
 import { env } from "../../config/env.js";
-import { prisma } from "../../lib/prisma.js";
 import type { BoldWebhookNotification } from "../bold/bold-link.types.js";
 import { getWebhookSecretForEnv, verifyBoldWebhookSignature } from "../bold/bold.signature.js";
 import { appRegistry } from "../apps/app.registry.js";
+import { findPaymentByReference } from "../../repositories/payment.repository.js";
+import {
+  findWebhookEvent,
+  markWebhookProcessed,
+  upsertWebhookEvent,
+} from "../../repositories/webhook.repository.js";
+import { updatePaymentsByReference } from "../../repositories/payment.repository.js";
 
 const STATUS_MAP: Record<string, string> = {
   SALE_APPROVED: "APPROVED",
@@ -21,57 +27,39 @@ export class WebhookService {
   }
 
   async processBoldEvent(notification: BoldWebhookNotification): Promise<void> {
-    const existing = await prisma.webhookEvent.findUnique({ where: { id: notification.id } });
+    const existing = await findWebhookEvent(notification.id);
     if (existing?.processed) return;
 
-    await prisma.webhookEvent.upsert({
-      where: { id: notification.id },
-      create: {
-        id: notification.id,
-        type: notification.type,
-        paymentId: notification.data.payment_id,
-        payload: JSON.stringify(notification),
-      },
-      update: {
-        type: notification.type,
-        payload: JSON.stringify(notification),
-      },
+    await upsertWebhookEvent({
+      id: notification.id,
+      type: notification.type,
+      paymentId: notification.data.payment_id,
+      payload: JSON.stringify(notification),
     });
 
     const reference = notification.data.metadata?.reference;
     if (!reference) {
-      await this.markProcessed(notification.id);
+      await markWebhookProcessed(notification.id);
       return;
     }
 
     const status = STATUS_MAP[notification.type] ?? notification.type;
 
-    await prisma.payment.updateMany({
-      where: { reference },
-      data: {
-        status,
-        boldEventType: notification.type,
-        boldPaymentId: notification.data.payment_id,
-        updatedAt: new Date(),
-      },
+    await updatePaymentsByReference(reference, {
+      status,
+      boldEventType: notification.type,
+      boldPaymentId: notification.data.payment_id,
     });
 
-    const payment = await prisma.payment.findUnique({ where: { reference } });
+    const payment = await findPaymentByReference(reference);
     if (payment) {
-      const app = appRegistry.getById(payment.appId);
+      const app = appRegistry.getById(payment.app_id);
       if (app?.webhookUrl) {
-        await this.forwardToApp(app.webhookUrl, notification, payment.appId);
+        await this.forwardToApp(app.webhookUrl, notification, payment.app_id);
       }
     }
 
-    await this.markProcessed(notification.id);
-  }
-
-  private async markProcessed(eventId: string) {
-    await prisma.webhookEvent.update({
-      where: { id: eventId },
-      data: { processed: true },
-    });
+    await markWebhookProcessed(notification.id);
   }
 
   private async forwardToApp(

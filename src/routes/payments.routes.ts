@@ -5,7 +5,8 @@ import { paymentLinkService } from "../modules/payments/payment-link.service.js"
 import { boldLinkClient } from "../modules/bold/bold-link.client.js";
 import { appRegistry } from "../modules/apps/app.registry.js";
 import { resolveAppReturnUrl } from "../modules/apps/return-url.js";
-import { prisma } from "../lib/prisma.js";
+import { listPaymentsByApp } from "../repositories/payment.repository.js";
+import { paymentRowToApi } from "../db/payment.types.js";
 
 const createLinkSchema = z.object({
   productId: z.string().optional(),
@@ -71,12 +72,8 @@ export async function paymentRoutes(app: FastifyInstance) {
 
   app.get("/v1/payments", async (request) => {
     const matuApp = requireAppAuth(request);
-    const payments = await prisma.payment.findMany({
-      where: { appId: matuApp.id },
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    });
-    return { status: "success", appId: matuApp.id, data: payments };
+    const payments = await listPaymentsByApp(matuApp.id, 30);
+    return { status: "success", appId: matuApp.id, data: payments.map(paymentRowToApi) };
   });
 
   app.get("/v1/apps", async (request) => {
