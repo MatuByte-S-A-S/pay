@@ -14,7 +14,8 @@ module.exports = {
       env_file: '.env',
       env: {
         NODE_ENV: 'production',
-        PORT: '3000',
+        /** 3000 = sitio Next.js "matubyte" en este VPS; no usar ese puerto */
+        PORT: '3020',
         HOST: '0.0.0.0',
       },
     },

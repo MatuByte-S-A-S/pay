@@ -1,27 +1,34 @@
 #!/usr/bin/env bash
-# Diagnóstico: ¿pay.matubyte.com llega a PM2 :3000?
 set -euo pipefail
 
-echo "=== 1. PM2 paymatubyte ==="
-pm2 describe paymatubyte 2>/dev/null | grep -E 'status|script path|exec cwd' || echo "PM2: paymatubyte no existe"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
 
-echo ""
-echo "=== 2. API local (debe responder JSON) ==="
-curl -sS -m 5 http://127.0.0.1:3000/health | head -c 400 || echo "FALLO: nada en :3000"
+PORT="${PORT:-3020}"
+if [[ -f .env ]]; then
+  p=$(grep -E '^PORT=' .env | tail -1 | cut -d= -f2 | tr -d '"' | tr -d ' ')
+  [[ -n "$p" ]] && PORT="$p"
+fi
 
+echo "=== Puerto PayMatuByte esperado: $PORT ==="
+echo ""
+echo "=== 1. PM2 ==="
+pm2 describe paymatubyte 2>/dev/null | grep -E 'status|restarts|script path' || echo "paymatubyte no en PM2"
+echo ""
+echo "=== 2. Quién usa :3000 y :$PORT ==="
+ss -tlnp 2>/dev/null | grep -E ':3000|:3020' || netstat -tlnp 2>/dev/null | grep -E ':3000|:3020' || true
+echo ""
+echo "=== 3. API PayMatuByte (debe ser JSON) ==="
+curl -sS -m 5 "http://127.0.0.1:${PORT}/health" | head -c 350 || echo "FALLO en :$PORT"
 echo ""
 echo ""
-echo "=== 3. HTTPS público (debe ser el mismo JSON, no HTML 404) ==="
+echo "=== 4. :3000 (suele ser Next.js matubyte — NO PayMatuByte) ==="
+curl -sS -m 5 http://127.0.0.1:3000/health 2>/dev/null | head -c 120 || true
+echo ""
+echo ""
+echo "=== 5. HTTPS público ==="
 curl -sS -m 10 -o /tmp/pay-health.txt -w "HTTP %{http_code}\n" https://pay.matubyte.com/health || true
-head -c 400 /tmp/pay-health.txt 2>/dev/null; echo
+head -c 350 /tmp/pay-health.txt 2>/dev/null; echo
 
 echo ""
-echo "=== 4. Nginx: quién atiende pay.matubyte.com ==="
-sudo nginx -T 2>/dev/null | grep -A2 'server_name pay.matubyte.com' || echo "No hay server_name pay.matubyte.com en nginx -T"
-
-echo ""
-echo "=== 5. sites-enabled ==="
-ls -la /etc/nginx/sites-enabled/ 2>/dev/null | grep -i pay || true
-
-echo ""
-echo "Si (2) OK pero (3) es HTML 404 → ejecuta: sudo bash deploy/fix-nginx-pay.sh"
+echo "Si (3) falla: en .env pon PORT=3020, git pull, bash deploy/deploy.sh, sudo bash deploy/fix-nginx-pay.sh"

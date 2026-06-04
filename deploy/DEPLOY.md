@@ -18,7 +18,9 @@ Usuario paga en Bold
 | `https://pay.matubyte.com/v1/payment` | Crear link (apps con Bearer apiKey) |
 | `https://pay.matubyte.com/v1/pay/return/matu-ai` | Callback Bold → relay |
 
-Proceso interno: **PM2** `paymatubyte` en puerto **3000** → **Nginx** proxy HTTPS.
+Proceso interno: **PM2** `paymatubyte` en puerto **3020** → **Nginx** proxy HTTPS.
+
+> En este VPS el puerto **3000** ya lo usa la web Next.js `matubyte` (PM2). No cambies PayMatuByte a 3000.
 
 ---
 
@@ -147,9 +149,17 @@ bash deploy/deploy.sh
 
 ## Resolución de problemas
 
-### Página HTML «404 This page could not be found» en pay.matubyte.com
+### HTML de matubyte.com o 404 en pay.matubyte.com
 
-Eso **no** es PayMatuByte: otro sitio del VPS (p. ej. `matubyte.com`) está capturando el subdominio.
+Causas típicas en este servidor:
+
+1. **Puerto equivocado:** `matubyte` (Next.js) usa **:3000**. PayMatuByte debe usar **:3020** en `.env`, PM2 y nginx.
+2. **Nginx** apunta a `:3000` → verás el sitio corporativo, no la API.
+
+```bash
+grep ^PORT= ~/apps/pay/.env   # debe ser 3020
+curl -s http://127.0.0.1:3020/health   # JSON PayMatuByte
+```
 
 ```bash
 cd ~/apps/pay
