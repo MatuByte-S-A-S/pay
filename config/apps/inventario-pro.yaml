@@ -1,0 +1,29 @@
+id: inventario-pro
+name: Inventario Pro
+apiKey: pk_inventario_pro_demo_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:5174/pago/resultado
+  production: https://inventariopro.matubyte.com/pago/resultado
+
+imageUrl: https://robohash.org/inventario-pro.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+
+convertUsdToCop: true
+
+catalog:
+  - id: mensual
+    name: Suscripción mensual
+    amount: 29
+    currency: USD
+    description: "Se convierte a COP cuando convertUsdToCop es true"
+
+  - id: anual-cop
+    name: Plan anual Colombia
+    amount: 890000
+    currency: COP

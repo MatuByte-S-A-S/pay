@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resultado del pago — PayMatuByte</title>
+    <link rel="stylesheet" href="/demo/styles.css" />
+  </head>
+  <body>
+    <div class="page" style="max-width: 520px; margin: 4rem auto">
+      <div class="card">
+        <h2 id="title">Procesando…</h2>
+        <p id="detail" class="subtitle"></p>
+        <pre id="raw" style="font-size: 0.8rem; color: var(--muted); margin-top: 1rem"></pre>
+        <a href="/" class="btn-link" style="margin-top: 1rem; display: inline-block">← Volver a demo</a>
+      </div>
+    </div>
+    <script>
+      const p = new URLSearchParams(location.search);
+      const status = (p.get("status") || "").toUpperCase();
+      const paid = p.get("paid") === "true" || status === "PAID";
+      const title = document.getElementById("title");
+      const detail = document.getElementById("detail");
+      const raw = document.getElementById("raw");
+
+      if (paid) {
+        title.textContent = "Pago exitoso";
+        document.querySelector(".card").style.borderColor = "rgba(52, 211, 153, 0.5)";
+      } else if (["REJECTED", "CANCELLED", "EXPIRED"].includes(status)) {
+        title.textContent = "Pago no completado";
+        document.querySelector(".card").style.borderColor = "rgba(248, 113, 113, 0.5)";
+      } else {
+        title.textContent = "Estado: " + (status || "desconocido");
+      }
+
+      detail.textContent =
+        "Referencia: " +
+        (p.get("reference") || "—") +
+        (p.get("transaction_id") ? " · Transacción: " + p.get("transaction_id") : "");
+
+      raw.textContent = JSON.stringify(Object.fromEntries(p.entries()), null, 2);
+    </script>
+  </body>
+</html>

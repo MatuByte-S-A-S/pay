@@ -1,0 +1,21 @@
+# Matu AI — recargas de saldo / tokens (dashboard chat.matubyte.com)
+id: matu-ai
+name: Matu AI
+apiKey: pk_matu_ai_local_dev_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/dashboard/billing/pago-resultado
+  # Cuando despliegues el dashboard en producción, descomenta y usa la misma ruta:
+  # production: https://chat.matubyte.com/dashboard/billing/pago-resultado
+  production: https://chat.matubyte.com/dashboard/billing/pago-resultado
+
+imageUrl: https://robohash.org/matu-ai.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+
+# El usuario elige USD o COP en el dashboard; Bold cobra en COP.
+convertUsdToCop: true

@@ -1,0 +1,32 @@
+id: paymatubyte
+name: PayMatuByte
+apiKey: pk_paymatubyte_demo_cambiar
+enabled: true
+
+# Frontend de ESTA app (no el dominio genérico de la empresa)
+returnUrls:
+  development: http://localhost:3000/demo/pago-resultado
+  production: https://pay.matubyte.com/demo/pago-resultado
+
+imageUrl: https://robohash.org/paymatubyte.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - BOTON_BANCOLOMBIA
+  - NEQUI
+
+convertUsdToCop: false
+
+catalog:
+  - id: plan-starter
+    name: Plan Starter
+    description: Hasta 3 proyectos
+    amount: 49900
+    currency: COP
+
+  - id: plan-business
+    name: Plan Business
+    description: Proyectos ilimitados
+    amount: 149900
+    currency: COP

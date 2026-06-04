@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Registro de cada intento de pago iniciado desde una app MatuByte.
+model Payment {
+  id              String   @id @default(uuid())
+  appId           String
+  reference       String   @unique
+  boldTransactionId String?
+  paymentLinkId     String?
+  checkoutUrl       String?
+  productId       String?
+  status          String   @default("PENDING")
+  amountTotal     Int
+  currency        String   @default("COP")
+  paymentMethod   String
+  description     String?
+  metadata        String?
+  boldEventType   String?
+  boldPaymentId   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([appId])
+  @@index([status])
+}
+
+/// Eventos webhook de Bold (idempotencia).
+model WebhookEvent {
+  id        String   @id
+  paymentId String?
+  type      String
+  payload   String
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([paymentId])
+}

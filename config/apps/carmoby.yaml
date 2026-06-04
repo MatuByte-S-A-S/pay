@@ -1,0 +1,24 @@
+# Ejemplo: Carmoby — otro SaaS MatuByte
+id: carmoby
+name: Carmoby
+apiKey: pk_carmoby_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/carmoby/pago/resultado
+  production: https://app.carmoby.com/pago/resultado
+
+imageUrl: https://robohash.org/carmoby.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+
+convertUsdToCop: false
+
+catalog:
+  - id: plan-mensual
+    name: Plan mensual Carmoby
+    amount: 79000
+    currency: COP

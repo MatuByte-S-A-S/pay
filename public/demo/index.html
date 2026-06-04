@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayMatuByte — Pago en línea</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/demo/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <div id="boldAlert" class="bold-alert hidden" role="alert"></div>
+
+      <header class="header">
+        <div class="brand">
+          <span class="brand-mark">MB</span>
+          <div>
+            <p class="brand-eyebrow">MatuByte S.A.S.</p>
+            <h1>PayMatuByte</h1>
+          </div>
+        </div>
+        <div class="env-badge" id="envBadge">—</div>
+      </header>
+
+      <main class="layout">
+        <section class="card catalog-card">
+          <h2>Producto</h2>
+          <p class="subtitle" id="modeSubtitle">Pago en línea con Bold.</p>
+          <div id="catalogList" class="catalog-list">
+            <p class="loading">Cargando…</p>
+          </div>
+        </section>
+
+        <section class="card checkout-card">
+          <h2 id="checkoutTitle">Pagar</h2>
+          <form id="checkoutForm" class="form">
+            <label class="field">
+              <span>Referencia (opcional)</span>
+              <input type="text" id="reference" placeholder="Se genera automáticamente" />
+            </label>
+            <div class="summary" id="summary">
+              <p class="summary-empty">Elige un producto.</p>
+            </div>
+            <button type="submit" class="btn-primary" id="payBtn" disabled>Generar link de pago</button>
+          </form>
+          <div id="resultPanel" class="result-panel hidden" aria-live="polite"></div>
+        </section>
+      </main>
+
+      <aside class="steps card">
+        <h3>Flujo</h3>
+        <ol id="flowSteps">
+          <li>Eliges producto y generas el link.</li>
+          <li>El cliente paga en <strong>checkout.bold.co</strong> (tarjeta, PSE, Nequi…).</li>
+          <li>Consultas estado con la referencia o el webhook.</li>
+        </ol>
+        <p class="sandbox-hint" id="sandboxHint"></p>
+      </aside>
+
+      <footer class="footer">
+        <span>Modo: <code id="boldMode">—</code></span>
+        <span id="appLabel">—</span>
+      </footer>
+    </div>
+    <script src="/demo/app.js" type="module"></script>
+  </body>
+</html>
