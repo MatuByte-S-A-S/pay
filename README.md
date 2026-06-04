@@ -23,7 +23,7 @@ Misma integración que **fymapp-api** (API Link de pagos), configurable por app 
 ```env
 MATUDB_URL=https://db.matudb.com
 MATUDB_PROJECT_ID=tu-proyecto
-MATUDB_SERVICE_KEY=mb_...
+MATUDB_API_KEY=mb_...
 NODE_ENV=development
 URL_API_BOLD=https://integrations.api.bold.co/online/link/v1
 AUTHORIZATION_BOLD="x-api-key <llave producción>"

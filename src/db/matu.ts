@@ -5,16 +5,16 @@ let adminClient: MatuDBClient | null = null;
 
 export function getDb(): MatuDBClient {
   if (!adminClient) {
-    const { matudbUrl, matudbProjectId, matudbServiceKey } = env;
+    const { matudbUrl, matudbProjectId, matudbApiKey } = env;
 
-    if (!matudbProjectId || !matudbServiceKey) {
-      throw new Error("MATUDB_PROJECT_ID y MATUDB_SERVICE_KEY (o MATUDB_API_KEY) son requeridos");
+    if (!matudbProjectId || !matudbApiKey) {
+      throw new Error("MATUDB_PROJECT_ID y MATUDB_API_KEY son requeridos");
     }
 
     adminClient = createClient({
       url: matudbUrl,
       projectId: matudbProjectId,
-      apiKey: matudbServiceKey,
+      apiKey: matudbApiKey,
       useSupabase: false,
     });
   }

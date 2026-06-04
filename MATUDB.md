@@ -11,8 +11,10 @@ Base de datos: **MatuDB** (PostgreSQL) con [`@devjuanes/matuclient`](https://www
 ```env
 MATUDB_URL=https://db.matudb.com
 MATUDB_PROJECT_ID=tu-project-id
-MATUDB_SERVICE_KEY=mb_tu_service_key
+MATUDB_API_KEY=mb_tu_api_key
 ```
+
+Igual que en la doc del cliente (`MATUDB_API_KEY` / `apiKey` en `createClient`).
 
 Opcional desde CLI (mismo SQL):
 
