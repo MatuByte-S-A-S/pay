@@ -14,11 +14,50 @@ fi
 
 mkdir -p data
 
-echo "→ npm ci"
-npm ci
+# Red inestable en VPS: reintentos al descargar binarios de Prisma
+export npm_config_fetch_retries=5
+export npm_config_fetch_retry_mintimeout=20000
+export npm_config_fetch_retry_maxtimeout=120000
 
-echo "→ prisma + build"
-npm run db:generate
+run_retry() {
+  local label="$1"
+  shift
+  local max=4
+  local n=1
+  while [[ $n -le $max ]]; do
+    echo "→ $label (intento $n/$max)"
+    if "$@"; then
+      return 0
+    fi
+    if [[ $n -eq $max ]]; then
+      echo "ERROR: $label falló tras $max intentos"
+      return 1
+    fi
+    echo "   Reintentando en 8s..."
+    sleep 8
+    n=$((n + 1))
+  done
+}
+
+install_deps() {
+  if [[ -d node_modules ]] && npm ls @prisma/client &>/dev/null; then
+    echo "→ node_modules OK, omitiendo npm ci"
+    return 0
+  fi
+
+  if run_retry "npm ci" npm ci; then
+    return 0
+  fi
+
+  echo "→ npm ci con --ignore-scripts (evita postinstall de Prisma en la red)"
+  run_retry "npm ci --ignore-scripts" npm ci --ignore-scripts
+}
+
+install_deps
+
+run_retry "prisma generate" npx prisma generate
+
+echo "→ build + db"
 npm run build
 npm run db:push
 

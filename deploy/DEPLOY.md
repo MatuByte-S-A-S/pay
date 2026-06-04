@@ -147,6 +147,30 @@ bash deploy/deploy.sh
 
 ## Resolución de problemas
 
+### `npm ci` falla en `@prisma/engines` (ECONNRESET / aborted)
+
+La red del VPS a veces corta la descarga de Prisma. En el servidor:
+
+```bash
+cd ~/apps/pay
+git pull
+rm -rf node_modules
+bash deploy/deploy.sh
+```
+
+El script reintenta solo y, si hace falta, usa `npm ci --ignore-scripts` y luego `npx prisma generate`.
+
+Manual:
+
+```bash
+npm config set fetch-retries 5
+npm ci --ignore-scripts
+npx prisma generate
+npm run build
+npm run db:push
+pm2 restart paymatubyte
+```
+
 | Síntoma | Qué revisar |
 |---------|-------------|
 | 401 UNAUTHORIZED | `apiKey` en YAML = `PAYMATUBYTE_API_KEY` en la app cliente |
