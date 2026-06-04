@@ -17,6 +17,8 @@ const envSchema = z.object({
   AUTHORIZATION_BOLD_DEV: z.string().min(10, "AUTHORIZATION_BOLD_DEV requerida (pruebas)"),
 
   URL_API_EXCHANGERATE: z.string().url().optional(),
+  /** COP por 1 USD si la API de cambio falla o no está configurada (Matu AI) */
+  EXCHANGE_RATE_COP_PER_USD: z.coerce.number().positive().default(4200),
   BOLD_DEFAULT_IMAGE_URL: z.string().url().optional(),
 
   /** URL pública de este backend (Bold → aquí → frontend de cada app). Debe ser HTTPS para Bold. */
@@ -38,6 +40,12 @@ const envSchema = z.object({
     .optional()
     .transform((v) => v !== "false" && v !== "0"),
   DEMO_APP_ID: z.string().default("paymatubyte"),
+
+  /** Firebase Cloud Messaging (cuenta de servicio) — push MatuPay */
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
+  FIREBASE_SERVICE_ACCOUNT_PATH: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

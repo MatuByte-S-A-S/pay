@@ -65,3 +65,13 @@ Nunca expongas las llaves Bold en tu app.
   - `GET /v1/wallet?environment=sandbox|live`
   - `GET /v1/payments?environment=sandbox`
 - Ejecuta `sql/002_sandbox_environment.sql` en MatuDB si el proyecto ya existía antes de este cambio.
+
+## 7. Push MatuPay (FCM)
+
+Cuando un pago pasa a **PAID**, PayMatuByte envía notificación a dispositivos registrados:
+
+- `POST /v1/devices/push-token` — `{ "token": "<fcm>", "platform": "android" }` (Bearer apiKey de `matupay`)
+- Tabla `paymatu_push_devices`, migración `sql/003_push_devices.sql`
+- `.env`: `FIREBASE_SERVICE_ACCOUNT_PATH` o `FIREBASE_PROJECT_ID` + `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`
+
+Ver `C:\dev\matupay\README-PAYMATU.md` para configurar Firebase en la app.

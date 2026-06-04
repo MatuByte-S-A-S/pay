@@ -65,7 +65,8 @@ Obligatorio:
 - `NODE_ENV=production`
 - `PAYMATUBYTE_PUBLIC_URL=https://pay.matubyte.com` (HTTPS, sin barra final)
 - `AUTHORIZATION_BOLD` y `AUTHORIZATION_BOLD_DEV` con formato `x-api-key ...` (llaves Bold **Link de pagos**)
-- `URL_API_EXCHANGERATE` si usas `convertUsdToCop` (Matu AI)
+- `URL_API_EXCHANGERATE` (opcional) o solo `EXCHANGE_RATE_COP_PER_USD=4200` para USD→COP (Matu AI)
+- Tras actualizar código: ejecutar en MatuDB `sql/002_sandbox_environment.sql` y `sql/003_push_devices.sql` si aún no están aplicadas (si no, recargas COP/USD devuelven 500 al insertar pagos)
 - **No** pongas `BOLD_DEV_NO_CALLBACK=true` en producción
 
 Genera master key:

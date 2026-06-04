@@ -4,6 +4,7 @@ import { AppError } from "./shared/errors.js";
 import { healthRoutes } from "./routes/health.routes.js";
 import { paymentRoutes } from "./routes/payments.routes.js";
 import { walletRoutes } from "./routes/wallet.routes.js";
+import { deviceRoutes } from "./routes/devices.routes.js";
 import { webhookRoutes } from "./routes/webhooks.routes.js";
 import { demoRoutes } from "./routes/demo.routes.js";
 import { returnRoutes } from "./routes/return.routes.js";
@@ -49,6 +50,7 @@ export async function buildApp() {
   await app.register(returnRoutes);
   await app.register(paymentRoutes);
   await app.register(walletRoutes);
+  await app.register(deviceRoutes);
   await app.register(webhookRoutes);
   await app.register(demoRoutes);
 
