@@ -163,11 +163,13 @@ curl -s http://127.0.0.1:3020/health   # JSON PayMatuByte
 
 ```bash
 cd ~/apps/pay
+git pull
 chmod +x deploy/*.sh
-bash deploy/diagnose-pay.sh
-sudo bash deploy/fix-nginx-pay.sh
-curl -s https://pay.matubyte.com/health
+# Arreglo automático (puerto 3020 + quitar pay de matubyte.com nginx + PM2)
+sudo bash deploy/fix-pay-complete.sh
 ```
+
+O paso a paso: `grep ^PORT= .env` → debe ser **3020**, luego `sudo bash deploy/fix-nginx-pay.sh`.
 
 Debe verse JSON con `"service":"PayMatuByte"`. Luego `bash deploy/deploy.sh` y `pm2 restart paymatubyte`.
 
