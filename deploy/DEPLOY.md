@@ -147,6 +147,20 @@ bash deploy/deploy.sh
 
 ## Resolución de problemas
 
+### Página HTML «404 This page could not be found» en pay.matubyte.com
+
+Eso **no** es PayMatuByte: otro sitio del VPS (p. ej. `matubyte.com`) está capturando el subdominio.
+
+```bash
+cd ~/apps/pay
+chmod +x deploy/*.sh
+bash deploy/diagnose-pay.sh
+sudo bash deploy/fix-nginx-pay.sh
+curl -s https://pay.matubyte.com/health
+```
+
+Debe verse JSON con `"service":"PayMatuByte"`. Luego `bash deploy/deploy.sh` y `pm2 restart paymatubyte`.
+
 ### `npm ci` falla en `@prisma/engines` (ECONNRESET / aborted)
 
 La red del VPS a veces corta la descarga de Prisma. En el servidor:

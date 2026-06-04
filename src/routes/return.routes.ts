@@ -13,7 +13,9 @@ export async function returnRoutes(app: FastifyInstance) {
     const { reference } = request.query as { reference?: string };
 
     if (!reference) {
-      return reply.status(400).send({ error: "reference requerido" });
+      return reply.type("text/html").send(
+        `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>PayMatuByte</title></head><body style="font-family:system-ui;max-width:32rem;margin:2rem auto;padding:0 1rem"><h1>PayMatuByte</h1><p>Endpoint de retorno Bold para <strong>${appId}</strong>.</p><p>Falta <code>?reference=...</code> en la URL (Bold lo añade tras el pago).</p><p><a href="/health">/health</a></p></body></html>`,
+      );
     }
 
     try {

@@ -37,6 +37,13 @@ export async function buildApp() {
     });
   });
 
+  app.get("/", async () => ({
+    service: "PayMatuByte",
+    company: "MatuByte S.A.S.",
+    health: "/health",
+    paymentReturn: "/v1/pay/return/:appId?reference=...",
+  }));
+
   await app.register(healthRoutes);
   await app.register(returnRoutes);
   await app.register(paymentRoutes);
