@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { getDb } from "../db/matu.js";
 import type { PaymentRow } from "../db/payment.types.js";
 import { matuUpdate } from "../lib/matu-query.js";
+import type { PaymentEnvironment } from "../modules/payments/payment-environment.js";
 
 export interface UpsertPaymentInput {
   appId: string;
@@ -14,6 +15,8 @@ export interface UpsertPaymentInput {
   currency: string;
   paymentMethod: string;
   description?: string | null;
+  environment?: PaymentEnvironment;
+  isSandbox?: boolean;
 }
 
 export async function findPaymentByReference(reference: string): Promise<PaymentRow | null> {
@@ -85,6 +88,8 @@ export async function upsertPaymentByReference(input: UpsertPaymentInput): Promi
     metadata: null,
     bold_event_type: null,
     bold_payment_id: null,
+    environment: input.environment ?? "live",
+    is_sandbox: input.isSandbox ?? input.environment === "sandbox",
     created_at: now,
     updated_at: now,
   };
@@ -101,15 +106,21 @@ export async function updatePaymentStatus(
     boldTransactionId?: string | null;
     boldEventType?: string | null;
     boldPaymentId?: string | null;
+    environment?: PaymentEnvironment;
+    isSandbox?: boolean;
   },
 ): Promise<void> {
-  const { error } = await matuUpdate(getDb(), "paymatu_payments", { id }, {
+  const patch: Record<string, unknown> = {
     status: data.status,
     bold_transaction_id: data.boldTransactionId,
     bold_event_type: data.boldEventType,
     bold_payment_id: data.boldPaymentId,
     updated_at: new Date().toISOString(),
-  });
+  };
+  if (data.environment) patch.environment = data.environment;
+  if (data.isSandbox !== undefined) patch.is_sandbox = data.isSandbox;
+
+  const { error } = await matuUpdate(getDb(), "paymatu_payments", { id }, patch);
   if (error) throw new Error(error.message);
 }
 
@@ -134,13 +145,26 @@ export async function updatePaymentsByReference(
 }
 
 export async function listPaymentsByApp(appId: string, limit = 30): Promise<PaymentRow[]> {
-  const { data, error } = await getDb()
+  return listPaymentsByAppAndEnvironment(appId, undefined, limit);
+}
+
+export async function listPaymentsByAppAndEnvironment(
+  appId: string,
+  environment?: PaymentEnvironment,
+  limit = 30,
+): Promise<PaymentRow[]> {
+  let query = getDb()
     .from("paymatu_payments")
     .select("*")
     .eq("app_id", appId)
     .order("created_at", { ascending: false })
     .limit(limit);
 
+  if (environment) {
+    query = query.eq("environment", environment);
+  }
+
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []) as PaymentRow[];
 }

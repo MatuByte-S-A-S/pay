@@ -5,8 +5,9 @@ import { paymentLinkService } from "../modules/payments/payment-link.service.js"
 import { boldLinkClient } from "../modules/bold/bold-link.client.js";
 import { appRegistry } from "../modules/apps/app.registry.js";
 import { resolveAppReturnUrl } from "../modules/apps/return-url.js";
-import { listPaymentsByApp } from "../repositories/payment.repository.js";
+import { listPaymentsByAppAndEnvironment } from "../repositories/payment.repository.js";
 import { paymentRowToApi } from "../db/payment.types.js";
+import { resolveWalletAppId } from "../modules/apps/wallet-app.js";
 
 const createLinkSchema = z.object({
   productId: z.string().optional(),
@@ -72,8 +73,22 @@ export async function paymentRoutes(app: FastifyInstance) {
 
   app.get("/v1/payments", async (request) => {
     const matuApp = requireAppAuth(request);
-    const payments = await listPaymentsByApp(matuApp.id, 30);
-    return { status: "success", appId: matuApp.id, data: payments.map(paymentRowToApi) };
+    const q = request.query as { environment?: string; limit?: string };
+    const environment =
+      q.environment === "sandbox" || q.environment === "live" ? q.environment : undefined;
+    const limit = Math.min(Number(q.limit) || 30, 100);
+    const walletAppId = resolveWalletAppId(matuApp);
+    const payments = await listPaymentsByAppAndEnvironment(
+      walletAppId,
+      environment,
+      limit,
+    );
+    return {
+      status: "success",
+      appId: walletAppId,
+      environment: environment ?? "all",
+      data: payments.map(paymentRowToApi),
+    };
   });
 
   app.get("/v1/apps", async (request) => {

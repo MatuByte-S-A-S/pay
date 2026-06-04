@@ -55,3 +55,13 @@ Nunca expongas las llaves Bold en tu app.
 1. `npm run dev` en PayMatuByte (`PAYMATUBYTE_PUBLIC_URL=http://localhost:3000`).
 2. Tu API + frontend con `returnUrls.development` apuntando al puerto de Vite.
 3. Llaves Bold en `.env` de PayMatuByte (`AUTHORIZATION_BOLD_DEV` con prefijo `x-api-key `).
+
+## 6. Modo prueba (sandbox) y MatuPay
+
+- En `NODE_ENV=development`, los pagos nuevos se guardan con `environment: sandbox`.
+- En producción, los pagos son `live`; Bold puede marcar `is_sandbox` al consultar el link.
+- Saldo acumulado al pasar a `PAID` / `APPROVED` en tabla `paymatu_app_balances` (live y sandbox **independientes**).
+- **MatuPay** (`config/apps/matupay.yaml`, `walletAppId: matu-ai`):
+  - `GET /v1/wallet?environment=sandbox|live`
+  - `GET /v1/payments?environment=sandbox`
+- Ejecuta `sql/002_sandbox_environment.sql` en MatuDB si el proyecto ya existía antes de este cambio.

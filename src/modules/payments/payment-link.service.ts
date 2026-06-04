@@ -9,9 +9,16 @@ import { resolveBoldCallbackForApp } from "./callback-url.js";
 import { resolveAppReturnUrl } from "../apps/return-url.js";
 import {
   findPaymentByLinkOrReference,
+  findPaymentByReference,
   updatePaymentStatus,
   upsertPaymentByReference,
 } from "../../repositories/payment.repository.js";
+import {
+  environmentFromBoldSandbox,
+  resolvePaymentEnvironment,
+  type PaymentEnvironment,
+} from "./payment-environment.js";
+import { applyPaymentToBalance } from "./balance.service.js";
 
 export interface CreatePaymentLinkInput {
   app: MatuByteApp;
@@ -68,6 +75,8 @@ export class PaymentLinkService {
       payment_methods,
     });
 
+    const environment = resolvePaymentEnvironment();
+
     const payment = await upsertPaymentByReference({
       appId: app.id,
       reference,
@@ -79,6 +88,8 @@ export class PaymentLinkService {
       currency,
       paymentMethod: "PAYMENT_LINK",
       description,
+      environment,
+      isSandbox: environment === "sandbox",
     });
 
     return {
@@ -90,6 +101,7 @@ export class PaymentLinkService {
         amount: total_amount,
         currency,
         appId: app.id,
+        environment,
         returnUrl: appReturnUrl,
         boldCallbackUrl: boldCallback.callback_url ?? null,
       },
@@ -117,17 +129,27 @@ export class PaymentLinkService {
 
     const boldId = payment.payment_link_id ?? linkId;
     const data = await boldLinkClient.getPaymentLink(boldId);
+    const environment = environmentFromBoldSandbox(data.is_sandbox) as PaymentEnvironment;
+    const previousStatus = payment.status;
 
     await updatePaymentStatus(payment.id, {
       status: data.status,
       boldTransactionId: data.transaction_id ?? payment.bold_transaction_id,
+      environment,
+      isSandbox: data.is_sandbox ?? environment === "sandbox",
     });
+
+    const updated = await findPaymentByReference(payment.reference);
+    if (updated) {
+      await applyPaymentToBalance(updated, data.status, previousStatus, environment);
+    }
 
     return {
       status: "success",
       data: {
         status: data.status,
         is_sandbox: data.is_sandbox,
+        environment,
         id: data.id,
         transaction_id: data.transaction_id,
         reference: payment.reference,

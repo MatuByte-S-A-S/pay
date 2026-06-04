@@ -1,0 +1,12 @@
+# MatuPay — app móvil (solo consulta saldo/transacciones de matu-ai)
+id: matupay
+name: MatuPay
+apiKey: pk_matupay_local_dev_cambiar
+enabled: true
+walletAppId: matu-ai
+
+returnUrls:
+  development: http://localhost
+  production: https://pay.matubyte.com
+
+catalog: []

@@ -39,6 +39,8 @@ export const appConfigSchema = z.object({
   convertUsdToCop: z.boolean().default(false),
 
   webhookUrl: z.string().url().optional(),
+  /** App cuyo saldo/transacciones lee MatuPay u otros dashboards (default: id de la app) */
+  walletAppId: z.string().optional(),
   catalog: z.array(catalogItemSchema).default([]),
 }).refine((data) => data.returnUrls || data.callbackUrl, {
   message: "Define returnUrls (development + production) o callbackUrl",

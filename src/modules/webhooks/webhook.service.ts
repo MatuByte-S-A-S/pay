@@ -2,13 +2,16 @@ import { env } from "../../config/env.js";
 import type { BoldWebhookNotification } from "../bold/bold-link.types.js";
 import { getWebhookSecretForEnv, verifyBoldWebhookSignature } from "../bold/bold.signature.js";
 import { appRegistry } from "../apps/app.registry.js";
-import { findPaymentByReference } from "../../repositories/payment.repository.js";
+import {
+  findPaymentByReference,
+  updatePaymentsByReference,
+} from "../../repositories/payment.repository.js";
 import {
   findWebhookEvent,
   markWebhookProcessed,
   upsertWebhookEvent,
 } from "../../repositories/webhook.repository.js";
-import { updatePaymentsByReference } from "../../repositories/payment.repository.js";
+import { applyPaymentToBalance } from "../payments/balance.service.js";
 
 const STATUS_MAP: Record<string, string> = {
   SALE_APPROVED: "APPROVED",
@@ -44,6 +47,8 @@ export class WebhookService {
     }
 
     const status = STATUS_MAP[notification.type] ?? notification.type;
+    const paymentBefore = await findPaymentByReference(reference);
+    const previousStatus = paymentBefore?.status ?? "";
 
     await updatePaymentsByReference(reference, {
       status,
@@ -52,6 +57,9 @@ export class WebhookService {
     });
 
     const payment = await findPaymentByReference(reference);
+    if (payment) {
+      await applyPaymentToBalance(payment, status, previousStatus);
+    }
     if (payment) {
       const app = appRegistry.getById(payment.app_id);
       if (app?.webhookUrl) {

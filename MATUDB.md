@@ -26,8 +26,11 @@ npm run db:setup
 
 | Tabla | Uso |
 |-------|-----|
-| `paymatu_payments` | Pagos / links Bold por app |
+| `paymatu_payments` | Pagos / links Bold por app (`environment`: `live` \| `sandbox`) |
+| `paymatu_app_balances` | Saldo acumulado por app y entorno (independiente live vs prueba) |
 | `paymatu_webhook_events` | Idempotencia webhooks Bold |
+
+Si ya creaste las tablas antes, ejecuta también `sql/002_sandbox_environment.sql` en el panel SQL.
 
 ---
 

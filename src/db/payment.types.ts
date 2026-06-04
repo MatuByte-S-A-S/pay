@@ -14,6 +14,8 @@ export interface PaymentRow {
   metadata: string | null;
   bold_event_type: string | null;
   bold_payment_id: string | null;
+  environment: string;
+  is_sandbox: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +47,8 @@ export function paymentRowToApi(row: PaymentRow) {
     metadata: row.metadata,
     boldEventType: row.bold_event_type,
     boldPaymentId: row.bold_payment_id,
+    environment: row.environment ?? "live",
+    isSandbox: row.is_sandbox ?? false,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
