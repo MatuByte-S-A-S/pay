@@ -144,7 +144,11 @@ export class PaymentLinkService {
 
     const updated = await findPaymentByReference(payment.reference);
     if (updated) {
-      await applyPaymentToBalance(updated, data.status, previousStatus, environment);
+      try {
+        await applyPaymentToBalance(updated, data.status, previousStatus, environment);
+      } catch (err) {
+        console.error("[paymatubyte] balance credit failed (return redirect continues):", err);
+      }
     }
 
     return {

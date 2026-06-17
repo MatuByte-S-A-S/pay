@@ -2,6 +2,12 @@ import { getDb } from "../db/matu.js";
 import { matuUpdate } from "../lib/matu-query.js";
 import type { PaymentEnvironment } from "../modules/payments/payment-environment.js";
 
+/** MatuDB devuelve BIGINT como string; sin esto JS concatena ("30000" + 30000 → "3000030000"). */
+function toCopAmount(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.round(n) : 0;
+}
+
 export interface AppBalanceRow {
   app_id: string;
   environment: PaymentEnvironment;
@@ -23,7 +29,10 @@ export async function getAppBalance(
 
   if (error) throw new Error(error.message);
 
-  if (data) return data as AppBalanceRow;
+  if (data) {
+    const row = data as AppBalanceRow;
+    return { ...row, balance_cop: toCopAmount(row.balance_cop) };
+  }
 
   return {
     app_id: appId,
@@ -39,7 +48,8 @@ export async function creditAppBalance(
   environment: PaymentEnvironment,
   amountCop: number,
 ): Promise<AppBalanceRow> {
-  if (amountCop <= 0) return getAppBalance(appId, environment);
+  const creditAmount = toCopAmount(amountCop);
+  if (creditAmount <= 0) return getAppBalance(appId, environment);
 
   const now = new Date().toISOString();
   const current = await getAppBalance(appId, environment);
@@ -55,7 +65,7 @@ export async function creditAppBalance(
     const { error } = await getDb().from("paymatu_app_balances").insert({
       app_id: appId,
       environment,
-      balance_cop: amountCop,
+      balance_cop: creditAmount,
       currency: "COP",
       updated_at: now,
     });
@@ -68,7 +78,7 @@ export async function creditAppBalance(
     "paymatu_app_balances",
     { app_id: appId, environment },
     {
-      balance_cop: current.balance_cop + amountCop,
+      balance_cop: current.balance_cop + creditAmount,
       updated_at: now,
     },
   );
