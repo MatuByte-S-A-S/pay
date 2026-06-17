@@ -90,6 +90,7 @@ export class PaymentLinkService {
       description,
       environment,
       isSandbox: environment === "sandbox",
+      returnUrl: appReturnUrl,
     });
 
     return {
@@ -114,10 +115,12 @@ export class PaymentLinkService {
 
     const statusResult = await this.getLinkStatus(reference);
     const { data } = statusResult;
+    const paymentRow = await findPaymentByReference(reference);
+    const storedReturnUrl = parseReturnUrlFromMetadata(paymentRow?.metadata ?? null);
 
     return {
       app,
-      returnUrl: resolveAppReturnUrl(app),
+      returnUrl: resolveAppReturnUrl(app, storedReturnUrl),
       payment: data,
     };
   }
@@ -156,6 +159,16 @@ export class PaymentLinkService {
         appId: payment.app_id,
       },
     };
+  }
+}
+
+function parseReturnUrlFromMetadata(metadata: string | null): string | undefined {
+  if (!metadata) return undefined;
+  try {
+    const parsed = JSON.parse(metadata) as { returnUrl?: unknown };
+    return typeof parsed.returnUrl === "string" ? parsed.returnUrl : undefined;
+  } catch {
+    return undefined;
   }
 }
 

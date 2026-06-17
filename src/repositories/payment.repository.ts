@@ -17,6 +17,7 @@ export interface UpsertPaymentInput {
   description?: string | null;
   environment?: PaymentEnvironment;
   isSandbox?: boolean;
+  returnUrl?: string;
 }
 
 export async function findPaymentByReference(reference: string): Promise<PaymentRow | null> {
@@ -51,21 +52,20 @@ export async function upsertPaymentByReference(input: UpsertPaymentInput): Promi
   const existing = await findPaymentByReference(input.reference);
 
   if (existing) {
-    const { error } = await matuUpdate(
-      getDb(),
-      "paymatu_payments",
-      { id: existing.id },
-      {
-        payment_link_id: input.paymentLinkId,
-        checkout_url: input.checkoutUrl,
-        status: input.status,
-        amount_total: input.amountTotal,
-        currency: input.currency,
-        product_id: input.productId ?? existing.product_id,
-        description: input.description ?? existing.description,
-        updated_at: now,
-      },
-    );
+    const patch: Record<string, unknown> = {
+      payment_link_id: input.paymentLinkId,
+      checkout_url: input.checkoutUrl,
+      status: input.status,
+      amount_total: input.amountTotal,
+      currency: input.currency,
+      product_id: input.productId ?? existing.product_id,
+      description: input.description ?? existing.description,
+      updated_at: now,
+    };
+    if (input.returnUrl) {
+      patch.metadata = JSON.stringify({ returnUrl: input.returnUrl });
+    }
+    const { error } = await matuUpdate(getDb(), "paymatu_payments", { id: existing.id }, patch);
     if (error) throw new Error(error.message);
     const updated = await findPaymentByReference(input.reference);
     if (!updated) throw new Error("No se pudo actualizar el pago");
@@ -85,7 +85,7 @@ export async function upsertPaymentByReference(input: UpsertPaymentInput): Promi
     currency: input.currency,
     payment_method: input.paymentMethod,
     description: input.description ?? null,
-    metadata: null,
+    metadata: input.returnUrl ? JSON.stringify({ returnUrl: input.returnUrl }) : null,
     bold_event_type: null,
     bold_payment_id: null,
     environment: input.environment ?? "live",
