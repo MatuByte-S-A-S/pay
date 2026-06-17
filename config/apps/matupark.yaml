@@ -1,0 +1,38 @@
+# MatuPark — administración de parqueaderos
+id: matupark
+name: MatuPark
+apiKey: pk_matupark_prod_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/premium/pago-resultado
+  production: https://app.matupark.com/premium/pago-resultado
+
+imageUrl: https://pay.matubyte.com/MatuPark.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+  - DAVIPLATA
+
+convertUsdToCop: false
+
+catalog:
+  - id: plan-mensual
+    name: MatuPark Mensual
+    description: Suscripción mensual — administración completa del parqueadero
+    amount: 27000
+    currency: COP
+
+  - id: plan-semestral
+    name: MatuPark Semestral
+    description: 6 meses con 10% de descuento
+    amount: 145800
+    currency: COP
+
+  - id: plan-anual
+    name: MatuPark Anual
+    description: 12 meses con 20% de descuento
+    amount: 259200
+    currency: COP
