@@ -1,0 +1,38 @@
+# MatuMailer — plataforma de correo MatuByte
+id: matumailer
+name: MatuMailer
+apiKey: pk_matumailer_prod_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:3000/dashboard/premium/pago-resultado
+  production: https://matumailer.matubyte.com/dashboard/premium/pago-resultado
+
+imageUrl: https://pay.matubyte.com/MatuMailer.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+  - DAVIPLATA
+
+convertUsdToCop: false
+
+catalog:
+  - id: plan-mensual
+    name: MatuMailer Mensual
+    description: Suscripción mensual Premium — envíos ilimitados, masivos y programados
+    amount: 25000
+    currency: COP
+
+  - id: plan-semestral
+    name: MatuMailer Semestral
+    description: 6 meses Premium con 10% de descuento
+    amount: 135000
+    currency: COP
+
+  - id: plan-anual
+    name: MatuMailer Anual
+    description: 12 meses Premium con 20% de descuento
+    amount: 240000
+    currency: COP
