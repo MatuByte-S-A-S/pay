@@ -1,0 +1,55 @@
+id: matucourse
+name: MatuCourse
+apiKey: pk_matucourse_live_a7f3d9e2b8c1f4a6e0d5b2c9f7e3a1d8
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/payment/result
+  production: https://matucourse.matubyte.com/payment/result
+
+imageUrl: https://matucourse.matubyte.com/logo.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - BOTON_BANCOLOMBIA
+  - NEQUI
+
+convertUsdToCop: false
+
+catalog:
+  - id: cpp-fundamentals
+    name: Curso C++ desde Cero hasta Profesional
+    description: Aprende C++ con 4 módulos completos - clases en vivo
+    amount: 400000
+    currency: COP
+
+  - id: fl-studio-producer
+    name: Producción Musical con FL Studio
+    description: Produce música profesional - clases en vivo
+    amount: 380000
+    currency: COP
+
+  - id: piano-desde-cero
+    name: Piano desde Cero
+    description: Aprende piano en clases virtuales en vivo
+    amount: 320000
+    currency: COP
+
+  - id: arduino-iot
+    name: Arduino y Electrónica para Programadores
+    description: Proyectos IoT con Arduino - clases en vivo
+    amount: 360000
+    currency: COP
+
+  - id: python-data-science
+    name: Python para Data Science
+    description: Análisis de datos y machine learning - clases en vivo
+    amount: 420000
+    currency: COP
+
+  - id: web-fullstack
+    name: Desarrollo Web Full-Stack
+    description: "De cero a full-stack: HTML, Vue, Node - clases en vivo"
+    amount: 500000
+    currency: COP
