@@ -5,8 +5,8 @@ apiKey: pk_matupark_prod_cambiar
 enabled: true
 
 returnUrls:
-  development: http://localhost:5173/register/pago-resultado
-  production: https://matupark.matubyte.com/premium/pago-resultado
+  development: http://localhost:5173/acceso/plataforma/registro-parqueadero/resultado-pago
+  production: https://matupark.matubyte.com/acceso/plataforma/registro-parqueadero/resultado-pago
 
 imageUrl: https://pay.matubyte.com/MatuPark.png
 

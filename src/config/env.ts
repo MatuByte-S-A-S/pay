@@ -25,8 +25,17 @@ const envSchema = z.object({
   PAYMATUBYTE_PUBLIC_URL: z.string().url().default("http://localhost:3000"),
 
   /**
-   * Solo desarrollo: omitir callback_url y cobrar solo con tarjeta (Bold rechaza http://localhost).
-   * Para flujo completo con PSE/retorno usa ngrok y PAYMATUBYTE_PUBLIC_URL=https://tu-tunnel.ngrok.app
+   * Si PAYMATUBYTE_PUBLIC_URL no es HTTPS (local), Bold recibe este host para callback_url.
+   * Debe apuntar a un PayMatuByte desplegado con la misma MatuDB (p. ej. pay.matubyte.com).
+   */
+  PAYMATUBYTE_CALLBACK_FALLBACK_URL: z
+    .string()
+    .url()
+    .default("https://pay.matubyte.com"),
+
+  /**
+   * Solo desarrollo: sin HTTPS local, omite callback_url Bold (solo tarjeta).
+   * Para retorno automático tras pagar usa ngrok en PAYMATUBYTE_PUBLIC_URL.
    */
   BOLD_DEV_NO_CALLBACK: z
     .string()

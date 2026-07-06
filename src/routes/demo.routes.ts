@@ -53,6 +53,5 @@ export async function demoRoutes(app: FastifyInstance) {
     return reply.type("text/html; charset=utf-8").send(html);
   };
 
-  app.get("/", sendDemoPage);
   app.get("/demo", sendDemoPage);
 }

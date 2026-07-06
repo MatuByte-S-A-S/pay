@@ -1,5 +1,6 @@
 import { env } from "../../config/env.js";
-import { getBoldAuthorizationHeader } from "./bold.auth.js";
+import { getBoldAuthorizationHeader, getBoldAuthorizationHeaderForEnvironment } from "./bold.auth.js";
+import type { PaymentEnvironment } from "../payments/payment-environment.js";
 import { AppError } from "../../shared/errors.js";
 import type {
   BoldCreateLinkRequest,
@@ -16,9 +17,11 @@ const DEFAULT_METHODS = ["CREDIT_CARD", "PSE", "BOTON_BANCOLOMBIA", "NEQUI"] as 
 export class BoldLinkClient {
   constructor(private readonly baseUrl = env.URL_API_BOLD) {}
 
-  private headers() {
+  private headers(environment?: PaymentEnvironment) {
     return {
-      Authorization: getBoldAuthorizationHeader(),
+      Authorization: environment
+        ? getBoldAuthorizationHeaderForEnvironment(environment)
+        : getBoldAuthorizationHeader(),
       "Content-Type": "application/json",
       Accept: "application/json",
     };
@@ -90,9 +93,12 @@ export class BoldLinkClient {
   }
 
   /** GET link status — respuesta en raíz (sin payload), igual que fymapp */
-  async getPaymentLink(linkId: string): Promise<BoldLinkStatusResponse> {
+  async getPaymentLink(
+    linkId: string,
+    environment?: PaymentEnvironment,
+  ): Promise<BoldLinkStatusResponse> {
     const res = await fetch(`${this.baseUrl}/${encodeURIComponent(linkId)}`, {
-      headers: this.headers(),
+      headers: this.headers(environment),
     });
     const raw = (await res.json().catch(() => ({}))) as BoldLinkStatusResponse & {
       message?: string;

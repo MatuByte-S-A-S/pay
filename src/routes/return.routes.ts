@@ -10,7 +10,12 @@ import { buildAppReturnRedirect } from "../modules/payments/callback-url.js";
 export async function returnRoutes(app: FastifyInstance) {
   app.get("/v1/pay/return/:appId", async (request, reply) => {
     const { appId } = request.params as { appId: string };
-    const { reference } = request.query as { reference?: string };
+    const query = request.query as {
+      reference?: string;
+      "bold-tx-status"?: string;
+      "bold-order-id"?: string;
+    };
+    const { reference } = query;
 
     if (!reference) {
       return reply.type("text/html").send(
@@ -19,7 +24,10 @@ export async function returnRoutes(app: FastifyInstance) {
     }
 
     try {
-      const { returnUrl, payment } = await paymentLinkService.handlePaymentReturn(appId, reference);
+      const { returnUrl, payment } = await paymentLinkService.handlePaymentReturn(appId, reference, {
+        "bold-tx-status": query["bold-tx-status"],
+        "bold-order-id": query["bold-order-id"],
+      });
       const target = buildAppReturnRedirect(returnUrl, {
         reference: payment.reference ?? reference,
         status: payment.status,
