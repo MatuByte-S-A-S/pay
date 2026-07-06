@@ -22,7 +22,7 @@ catalog:
   - id: plan-mensual
     name: MatuPark Mensual
     description: Suscripción mensual — administración completa del parqueadero
-    amount: 1000
+    amount: 27000
     currency: COP
 
   - id: plan-semestral
