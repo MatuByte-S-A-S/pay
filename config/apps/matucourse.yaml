@@ -19,14 +19,50 @@ convertUsdToCop: false
 
 catalog:
   - id: cpp-fundamentals
-    name: Curso C++ desde Cero hasta Profesional
-    description: Aprende C++ con 4 módulos completos - clases en vivo
+    name: C++ desde Cero
+    description: Aprende C++ paso a paso — clases en vivo
     amount: 400000
+    currency: COP
+
+  - id: create-web-app-vue
+    name: Crea tu Primera App Web con Vue.js
+    description: Vue.js 3 desde cero — clases en vivo
+    amount: 350000
+    currency: COP
+
+  - id: create-mobile-app
+    name: Crea tu Primera App Móvil con Flutter
+    description: Flutter y Dart desde cero — clases en vivo
+    amount: 370000
+    currency: COP
+
+  - id: postgresql-desde-cero
+    name: Bases de Datos con PostgreSQL y SQL
+    description: SQL y PostgreSQL desde cero — clases en vivo
+    amount: 340000
+    currency: COP
+
+  - id: nodejs-api
+    name: Crea una API REST con Node.js desde Cero
+    description: Node.js y Express — clases en vivo
+    amount: 360000
+    currency: COP
+
+  - id: git-github
+    name: Git y GitHub - Control de Versiones
+    description: Git y GitHub para proyectos reales — clases en vivo
+    amount: 200000
+    currency: COP
+
+  - id: figma-diseno
+    name: Diseño de Interfaces con Figma
+    description: UI/UX con Figma — clases en vivo
+    amount: 300000
     currency: COP
 
   - id: fl-studio-producer
     name: Producción Musical con FL Studio
-    description: Produce música profesional - clases en vivo
+    description: Produce música profesional — clases en vivo
     amount: 380000
     currency: COP
 
@@ -38,18 +74,12 @@ catalog:
 
   - id: arduino-iot
     name: Arduino y Electrónica para Programadores
-    description: Proyectos IoT con Arduino - clases en vivo
+    description: Proyectos IoT con Arduino — clases en vivo
     amount: 360000
-    currency: COP
-
-  - id: python-data-science
-    name: Python para Data Science
-    description: Análisis de datos y machine learning - clases en vivo
-    amount: 420000
     currency: COP
 
   - id: web-fullstack
     name: Desarrollo Web Full-Stack
-    description: "De cero a full-stack: HTML, Vue, Node - clases en vivo"
+    description: "De cero a full-stack: HTML, Vue, Node — clases en vivo"
     amount: 500000
     currency: COP
