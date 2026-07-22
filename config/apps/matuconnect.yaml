@@ -1,0 +1,26 @@
+# MatuConnect — Chat & Widget de Soporte
+id: matuconnect
+name: MatuConnect
+apiKey: pk_matuconnect_prod_cambiar
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/app/billing/pago-resultado
+  production: https://matuconnect.matubyte.com/app/billing/pago-resultado
+
+imageUrl: https://pay.matubyte.com/matuconnect.png
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+  - DAVIPLATA
+
+convertUsdToCop: false
+
+catalog:
+  - id: plan-avanzado
+    name: MatuConnect Avanzado
+    description: Plan Avanzado mensual — widgets, IA, campañas y equipos
+    amount: 35000
+    currency: COP
