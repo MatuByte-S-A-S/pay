@@ -5,8 +5,8 @@ apiKey: pk_matupdf_live_c8f2a9e1b4d7f3a6c0e5b8d2a7f1c9e4b6d0a3f8
 enabled: true
 
 returnUrls:
-  development: http://localhost:3088/combinar?tip=thanks
-  production: https://matupdf.matubyte.com/combinar?tip=thanks
+  development: http://localhost:3088/?tip=thanks
+  production: https://matupdf.matubyte.com/?tip=thanks
 
 imageUrl: https://matupdf.matubyte.com/icons/Icon-192.png
 
