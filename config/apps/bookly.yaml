@@ -1,0 +1,26 @@
+# Bookly (ebook-app) — compra de libros y plan VIP
+id: bookly
+name: Bookly
+apiKey: pk_bookly_live_f3a8c2e91b4d7065a0e1c9d7b5f8246e1a3c0d9b7e5f2a8
+enabled: true
+
+returnUrls:
+  development: http://localhost:5173/pago-exitoso
+  production: https://bookly.matubyte.com/pago-exitoso
+
+imageUrl: https://matubyte.com/MatuByte.jpeg
+
+paymentMethods:
+  - CREDIT_CARD
+  - PSE
+  - NEQUI
+  - DAVIPLATA
+
+convertUsdToCop: false
+
+catalog:
+  - id: vip-vitalicio
+    name: Plan VIP Vitalicio Bookly
+    description: Monedas ilimitadas, sin anuncios y acceso a todos los libros
+    amount: 500000
+    currency: COP
